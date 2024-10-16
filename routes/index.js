@@ -1,7 +1,7 @@
-import Auth from "./auth.js";
+import router from "./auth.js";
 
 import Verify from "../middleware/verify.js";
-import authenticateToken from "../middleware/verify.js";
+import { Logout } from "../controllers/auth.js";
 
 const Router = (server) => {
   // home route with the get method and a handler
@@ -23,11 +23,16 @@ const Router = (server) => {
   
   
   server.get("/v1/user", Verify, (req, res) => {
-      const userId = req.user.userId;
+      const userId = req.user;
       res.json({ message: `Protected resource accessed by user ${userId}` });
     });
+    
+    
+    server.use("/v1/auth", router);
+    
+    server.get('/logout', Logout);
 
     
-    server.use("/v1/auth", Auth);
+
   };
 export default Router;

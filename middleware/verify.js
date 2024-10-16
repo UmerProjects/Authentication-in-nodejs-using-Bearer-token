@@ -1,25 +1,45 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import { SECRET_ACCESS_TOKEN } from "../config/index.js";
+import blacklist from "../models/blacklist.js";
+import {getLatestToken} from "../controllers/auth.js";
+
 
 export default async function Verify(req, res, next) {
+
   try {
     const authHeader = req.headers["authorization"];
-    console.log(authHeader);
-
+    // console.log(authHeader);
+    
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.sendStatus(401); // Unauthorized
     }
+    
+    
+    const bearerToken = authHeader.split(" ")[1]; 
+    console.log(bearerToken); 
 
-    const token = authHeader.split(" ")[1];
-    console.log(token);
+    //function when we logout
 
-    jwt.verify(token, SECRET_ACCESS_TOKEN, async (err, decoded) => {
+    const checkIfBlacklisted = await blacklist.findOne({ token: bearerToken }); 
+    if (checkIfBlacklisted)
+        return res
+            .status(401)
+            .json({ message: "This session has expired. Please login again  " });
+
+    // const token = authHeader.split(" ")[1];
+    // console.log(token);
+
+    // console.log(SECRET_ACCESS_TOKEN);
+
+
+    jwt.verify(bearerToken, SECRET_ACCESS_TOKEN, async (err, decoded) => {
       console.log("Decoded JWT:", decoded);
+
 
       if (err) {
         return res.status(401).json({
-          message: "This session has expired. Please log in.",
+          message: "This session has expired. Please log in. ",
         });
       }
 
@@ -36,7 +56,8 @@ export default async function Verify(req, res, next) {
 
       const { password, ...data } = user._doc;
 
-      req.user = data;
+      req.user = data.first_name;
+      console.log(req.user);
       next();
     });
   } catch (err) {

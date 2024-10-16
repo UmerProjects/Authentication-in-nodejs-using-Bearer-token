@@ -1,5 +1,8 @@
-import User from "../models/User.js";
 import bcrypt from "bcrypt";
+import User from "../models/User.js";
+import blacklist from "../models/blacklist.js";
+
+  let latestToke = ''
 
 export async function Register(req, res) {
   const { first_name, last_name, email, password } = req.body;
@@ -39,53 +42,100 @@ export async function Register(req, res) {
 }
 
 export async function Login(req, res) {
-  const { email, password } = req.body;
-
+  const { email, password } = req.body; 
   try {
     // Check if the user exists
-    const user = await User.findOne({ email }).select("+password");
+    const user = await User.findOne({ email }).select("password");
+
     if (!user) {
       return res.status(401).json({
         status: "failed",
-        data: [],
-        message: "Invalid email or password. Please try again.",
+        data: {},
+        message: "Invalid email or password.",
       });
     }
 
-    // Validate the password
+    // Validate password
     const isPasswordValid = await bcrypt.compare(
-      `${req.body.password}`,
+      password,
       user.password
     );
+      
+    // console.log(isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({
         status: "failed",
-        data: [],
-        message: "Invalid email or password. Please try again.",
+        data: {},
+        message: "Invalid email or password.",
       });
     }
 
-    // Generate JWT token
-    const token = user.generateAccessJWT();
-    console.log(token);
+    // Generate JWT
 
-    // Remove password from the user data before sending response
+    // Return token and user info
+
+    
+    const token = user.generateAccessJWT();
+
+
+    // if (latestToke != token){
+    //   latestToke = token;
+    // }
+
+    // latestToke = token;
+    
+    console.log(token);
+    // console.log("it is not working");
+
+
     const { password: pwd, ...userData } = user._doc;
 
-    // Send the token and user data in the response
+
     res.status(200).json({
       status: "success",
       message: "You have successfully logged in.",
-      token: `Bearer ${token}`,
+      token: `${token}`,
       user: userData,
     });
+
   } catch (err) {
-    console.error("Login Error:", err);
     res.status(500).json({
       status: "error",
       code: 500,
       data: [],
-      message: "Internal Server Error",
+      message: "Internal Server Error inn the code",
     });
   }
 }
+
+export async function Logout(req, res) {
+  try { 
+    const authHeader = req.headers['authorization']; 
+    if (!authHeader) return res.sendStatus(204); 
+    const bearerToken = authHeader.split(' ')[1]; 
+    const checkIfBlacklisted = await blacklist.findOne({ token: bearerToken });
+    console.log("extracted token",   bearerToken);
+    if (checkIfBlacklisted) return res.sendStatus(204);
+    const newBlacklist = new blacklist({
+      token: bearerToken,
+    });
+
+    await newBlacklist.save();
+    // Also clear request cookie on client
+    res.setHeader('Clear-Site-Data', '"cookies"');
+    res.status(200).json({ message: 'You are logged out!' });
+  } catch (err) {
+    res.status(500).json({
+      status: 'error',
+      message: 'Internal Server Error',
+    });
+  }
+  res.end();
+}
+
+
+
+
+export const getLatestToken = () => latestToke;
+
+

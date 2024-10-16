@@ -3,6 +3,8 @@ import { Register } from "../controllers/auth.js";
 import Validate from "../middleware/validate.js";
 import { check } from "express-validator";
 import { Login } from "../controllers/auth.js";
+import { authenticateUser } from "../middleware/authenticateUser.js";
+import { userController } from "../controllers/controllerPost.js";
 
 const router = express.Router();
 
@@ -43,5 +45,10 @@ router.post(
   Validate,
   Login
 );
+
+
+router.post("/post", authenticateUser, userController);
+
+
 
 export default router;

@@ -15,7 +15,7 @@ server.use(cookieParser());
 
 //We used the below line when the user have to fill the form using html
 
-// server.use(express.urlencoded({ extended: false }));
+server.use(express.urlencoded({ extended: false }));
 
 // It Will Parse the Json request body
 
