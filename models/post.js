@@ -6,10 +6,15 @@ const postByUser = new mongoose.Schema({
     required: "Title is required to continue the process",
     max: 150,
   },
+  message: {
+    type: String,
+  },
+
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
+
   createdAt: {
     type: Date,
     default: Date.now,

@@ -1,5 +1,5 @@
 import router from "./auth.js";
-
+import userRouter from "./user.js";
 import Verify from "../middleware/verify.js";
 import { Logout } from "../controllers/auth.js";
 
@@ -31,6 +31,8 @@ const Router = (server) => {
     server.use("/v1/auth", router);
     
     server.get('/logout', Logout);
+
+    server.use('/v1/user', userRouter)
 
     
 

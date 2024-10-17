@@ -47,7 +47,6 @@ router.post(
 );
 
 
-router.post("/post", authenticateUser, userController);
 
 
 
