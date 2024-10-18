@@ -2,6 +2,7 @@ import router from "./auth.js";
 import userRouter from "./user.js";
 import Verify from "../middleware/verify.js";
 import { Logout } from "../controllers/auth.js";
+import allPosts from "./Allposts.js";
 
 const Router = (server) => {
   // home route with the get method and a handler
@@ -33,6 +34,8 @@ const Router = (server) => {
     server.get('/logout', Logout);
 
     server.use('/v1/user', userRouter)
+
+    server.use('/all', allPosts)
 
     
 

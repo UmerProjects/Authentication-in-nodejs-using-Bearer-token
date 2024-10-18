@@ -12,6 +12,7 @@ const postByUser = new mongoose.Schema({
 
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
 
@@ -21,4 +22,4 @@ const postByUser = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("post", postByUser);
+export default mongoose.model("Post", postByUser);
