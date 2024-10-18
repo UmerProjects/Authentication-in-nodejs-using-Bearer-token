@@ -5,7 +5,7 @@ import Post from "../models/post.js";
 
 export async function showAllPosts(req, res) {
   try {
-    const posts = await Post.find({}).populate('createdBy', 'first_name');
+    const posts = await Post.find({}).populate('    ', 'first_name');
 
     if (!posts.length) {
       return res.status(404).json({
